@@ -30,7 +30,7 @@ The pipeline follows a standard, production-oriented batch ingestion pattern.
 5. Curated models are deployed to a production database
 
 ### Architecture Diagram
-> 📸 **Include screenshot here:** End-to-end architecture diagram showing Glue → S3 → Snowflake → dbt
+![Pipeline Architecture Diagram](screenshots/architecture-diagram.png)
 
 This architecture mirrors patterns commonly used in modern analytics platforms.
 
@@ -69,12 +69,15 @@ Security and access control were implemented using separate IAM roles to enforce
   - Writing data to the S3 bucket
   - Logging execution details to CloudWatch
 
+![Glue_IAM_Role]('screenshots/glue-iam-role.png')
+
 ### Snowflake Storage Integration Role
 - Trusted by Snowflake via External ID
 - Read-only access to a specific S3 data prefix
 - Used exclusively by Snowflake to read external data
 
-> 📸 **Include screenshot here:** IAM role trust relationships and permissions
+![Snowflake_IAM_Role]('screenshots/snowflake-iam-role.png')
+![Snowflake_Trust Relationship]('screenshots/snowflake-trust-relationship.png')
 
 This separation mirrors production-grade security patterns used in enterprise environments.
 
@@ -94,9 +97,8 @@ Key characteristics:
 - Data confirmed in the S3 data directory
 - Execution logs reviewed for errors
 
-> 📸 **Include screenshots here:**  
-> - Successful Glue job run  
-> - S3 bucket showing populated data folder  
+![Glue Job Success]('screenshots/glue-job-success.png')
+![S3 Contents]('screenshots/s3-contents.png')
 
 ---
 
@@ -115,9 +117,8 @@ Configuration included:
 - External stage access confirmed
 - Data successfully visible from Snowflake
 
-> 📸 **Include screenshots here:**  
-> - Snowflake storage integration details  
-> - External stage listing S3 contents  
+![Snowflake Storage Integration Details]('screenshots/snowflake-integration-details.png')
+![Snowflake Stage Details]('screenshots/snowflake-stage-details.png')
 
 This approach minimizes data movement and aligns with Snowflake best practices.
 
@@ -132,7 +133,7 @@ Design highlights:
 - Reusable macros to manage ingestion behavior
 - Model-level documentation and testing
 
-> 📸 **Include screenshot here:** dbt project structure or dbt Cloud environment overview
+![DBT Project Structure]('screenshots/dbt-project-structure.png')
 
 ---
 
@@ -156,10 +157,9 @@ Design highlights:
 - Optimized for BI and reporting access
 - Written to a dedicated MART schema
 
-> 📸 **Include screenshots here:**  
-> - RAW schema tables  
-> - TRANSFORM schema tables  
-> - MART schema tables  
+![Raw Schema Table]('screenshots/raw-schema-table.png')
+![Tranform Schema Table]('screenshots/transform-schema-table.png')
+![Mart Schema Tables]('screenshots/mart-schema-tables.png')
 
 ---
 
@@ -171,8 +171,6 @@ Tests applied across models:
 - Non-null constraints
 
 Test definitions are maintained alongside models to ensure transparency and maintainability.
-
-> 📸 **Include screenshot here:** Successful dbt test execution results
 
 All tests passed successfully in both development and production environments.
 
@@ -187,7 +185,8 @@ Deployment process:
 - Executed all models and tests as a single production job
 - Validated successful execution
 
-> 📸 **Include screenshot here:** Successful production dbt job run
+![DBT Job Success]('screenshots/dbt-job-success.png')
+![DBT Data Lineage]('screenshots/dbt-lineage.png')
 
 ---
 
@@ -198,7 +197,7 @@ Post-deployment validation confirmed:
 - Tables contained data in production
 - Record counts were consistent with expectations
 
-> 📸 **Include screenshot here:** Query results showing populated production tables
+![Snowflake Validation Details]('screenshots/snowflake-validation-details.png')
 
 ---
 
