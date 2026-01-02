@@ -1,31 +1,45 @@
 # Production-Grade Data Pipeline  
-### AWS Glue → Amazon S3 → Snowflake → dbt (Dev & Prod)
+### AWS Glue → Amazon S3 → Snowflake → dbt (Development & Production)
+
+---
 
 ## Executive Summary
-This project demonstrates the design, implementation, and production deployment of a modern batch data pipeline using AWS, Snowflake, and dbt. The pipeline ingests semi-structured JSON data from a public GitHub repository, lands it in Amazon S3 via AWS Glue, loads it into Snowflake using a secure storage integration and external stage, and transforms the data through a layered dbt modeling approach (RAW → TRANSFORM → MART).
+This project demonstrates the end-to-end design, implementation, validation, and production deployment of a modern batch data pipeline using AWS, Snowflake, and dbt.
 
-The project emphasizes **real-world data engineering best practices**, including IAM role isolation, external data access patterns, dbt macros, testing, environment separation, and production validation.
+The pipeline ingests semi-structured JSON data from a public GitHub repository, lands it in Amazon S3 via AWS Glue, loads it into Snowflake using a secure storage integration and external stage, and transforms the data through a layered dbt modeling approach (RAW → TRANSFORM → MART).
 
-All infrastructure was intentionally **validated and then torn down** to avoid ongoing cloud costs. This repository serves as the permanent artifact proving implementation, correctness, and engineering decision-making.
+The primary goal of this project is to showcase **real-world data engineering practices**, including:
+- Cloud IAM and service isolation
+- External data access patterns
+- Warehouse-native transformations
+- dbt macros, testing, and documentation
+- Environment separation and production promotion
+
+All cloud infrastructure was intentionally **validated and then torn down** to prevent ongoing costs. This repository serves as the permanent proof of design decisions, execution, and correctness.
 
 ---
 
 ## Architecture Overview
-**High-level flow:**
-1. AWS Glue ingests JSON data from GitHub
-2. Data is written to Amazon S3
-3. Snowflake reads data via Storage Integration and External Stage
-4. dbt performs transformations and testing
-5. Models are promoted to a production database
+The pipeline follows a standard, production-oriented batch ingestion pattern.
 
-This architecture mirrors patterns commonly used in production analytics and data warehousing environments.
+**High-level flow:**
+1. AWS Glue ingests JSON data from a public source
+2. Data is written to Amazon S3
+3. Snowflake accesses S3 data via a storage integration and external stage
+4. dbt transforms and tests the data
+5. Curated models are deployed to a production database
+
+### Architecture Diagram
+> 📸 **Include screenshot here:** End-to-end architecture diagram showing Glue → S3 → Snowflake → dbt
+
+This architecture mirrors patterns commonly used in modern analytics platforms.
 
 ---
 
 ## Table of Contents
 - [Technology Stack](#technology-stack)
 - [Security & IAM Design](#security--iam-design)
-- [Data Ingestion (AWS Glue)](#data-ingestion-aws-glue)
+- [Data Ingestion](#data-ingestion)
 - [Snowflake External Data Access](#snowflake-external-data-access)
 - [dbt Project Design](#dbt-project-design)
 - [Transformation Layers](#transformation-layers)
@@ -39,165 +53,172 @@ This architecture mirrors patterns commonly used in production analytics and dat
 
 ## Technology Stack
 - **AWS Glue** – Serverless batch ingestion
-- **Amazon S3** – Object storage / data lake
+- **Amazon S3** – Object storage and data lake
 - **Snowflake** – Cloud data warehouse
-- **dbt Core & dbt Cloud** – Transformations, testing, orchestration
-- **Python** – Glue ETL logic
-- **SQL** – Snowflake objects and dbt models
+- **dbt (Core & Cloud)** – Transformations, testing, orchestration
+- **Python & SQL** – ETL logic and transformations
 
 ---
 
 ## Security & IAM Design
-Two distinct IAM roles were created to enforce separation of concerns and least-privilege access.
+Security and access control were implemented using separate IAM roles to enforce least-privilege access and service isolation.
 
 ### Glue Service Role
 - Trusted by the AWS Glue service
-- Permissions:
-  - Read/write access to the S3 data bucket
-  - CloudWatch Logs access for job monitoring
+- Permissions limited to:
+  - Writing data to the S3 bucket
+  - Logging execution details to CloudWatch
 
 ### Snowflake Storage Integration Role
 - Trusted by Snowflake via External ID
-- Read-only access to the S3 `/data` prefix
-- Used exclusively for Snowflake external data access
+- Read-only access to a specific S3 data prefix
+- Used exclusively by Snowflake to read external data
 
-This design reflects production-grade security practices.
+> 📸 **Include screenshot here:** IAM role trust relationships and permissions
+
+This separation mirrors production-grade security patterns used in enterprise environments.
 
 ---
 
-## Data Ingestion (AWS Glue)
-- Implemented a Python-based AWS Glue job
+## Data Ingestion
+Data ingestion was implemented using AWS Glue.
+
+Key characteristics:
+- Serverless batch ingestion
 - Pulls JSON data from a public GitHub repository
 - Writes raw data directly to Amazon S3
-- Job executed manually for validation
+- Executed manually for validation
 
-**Verification steps:**
-- Successful Glue job execution
-- Confirmed data landed in the S3 `/data` directory
-- Reviewed CloudWatch logs for errors
+### Ingestion Validation
+- Glue job completed successfully
+- Data confirmed in the S3 data directory
+- Execution logs reviewed for errors
+
+> 📸 **Include screenshots here:**  
+> - Successful Glue job run  
+> - S3 bucket showing populated data folder  
 
 ---
 
 ## Snowflake External Data Access
-Snowflake was configured to read data directly from S3 using native integrations.
+Snowflake was configured to read data directly from Amazon S3 using native external access features.
 
-Steps performed:
-1. Created a dedicated Snowflake database for the project
-2. Created a Storage Integration referencing:
-   - IAM role ARN
-   - S3 bucket and data prefix
-3. Retrieved Snowflake AWS User ARN and External ID
-4. Updated IAM trust relationship
-5. Created an External Stage pointing to S3
-6. Validated access using:
-   ls @GLUE_S3_STAGE;  
-7. Created a RAW table with a single VARIANT column
+Configuration included:
+- Dedicated Snowflake database for the project
+- Storage integration referencing:
+  - S3 bucket and data prefix
+  - IAM role with restricted access
+- External stage pointing to the S3 data location
+- Raw table designed to store semi-structured data
 
-This approach avoids unnecessary data movement and follows Snowflake best practices.
+### Verification
+- External stage access confirmed
+- Data successfully visible from Snowflake
+
+> 📸 **Include screenshots here:**  
+> - Snowflake storage integration details  
+> - External stage listing S3 contents  
+
+This approach minimizes data movement and aligns with Snowflake best practices.
 
 ---
 
 ## dbt Project Design
-The dbt project was initialized using a Snowflake partner connection and structured for scalability and maintainability.
+The dbt project was structured to reflect production analytics workflows.
 
-### Key design decisions:
-- Separate development and production environments
-- Explicit schemas per transformation layer
-- Reusable macros for ingestion logic
+Design highlights:
+- Clear separation between development and production environments
+- Layered model organization
+- Reusable macros to manage ingestion behavior
 - Model-level documentation and testing
+
+> 📸 **Include screenshot here:** dbt project structure or dbt Cloud environment overview
 
 ---
 
 ## Transformation Layers
 
 ### RAW Layer
-- Loads data from the Snowflake external stage into Snowflake-managed table (the copy table)
-- Uses a custom dbt macro to ensure idempotent batch loads:
-  - Deletes existing records in the copy table
-  - Reloads fresh data from the external stage on each run
-- Performs an initial `LATERAL FLATTEN` on the JSON payload
-- Adds an ingestion timestamp column (`insert_dts`)
-- Loads data into the RAW table
-
-This layer preserves the original structure while making the data queryable and traceable.
-
----
+- Ingests data from the external stage into Snowflake-managed tables
+- Performs minimal transformations to preserve source fidelity
+- Adds an ingestion timestamp for traceability
+- Uses a macro-driven approach to ensure idempotent batch loads
 
 ### TRANSFORM Layer
-- Fully flattens remaining nested JSON structures
-- Standardizes and cleans fields
-- Produces analysis-ready intermediate table
-
----
+- Fully flattens nested JSON structures
+- Cleans and standardizes fields
+- Prepares data for analytical use cases
+- Serves as the primary intermediate layer
 
 ### MART Layer
-- Final analytics-ready models
-- Data grouped by continent
-- Optimized for downstream reporting and consumption
+- Final, analytics-ready models
+- Data grouped by continent for downstream consumption
+- Optimized for BI and reporting access
+- Written to a dedicated MART schema
+
+> 📸 **Include screenshots here:**  
+> - RAW schema tables  
+> - TRANSFORM schema tables  
+> - MART schema tables  
 
 ---
 
 ## Testing & Data Quality
-All dbt models include built-in tests to enforce data integrity and reliability.
+Data quality was enforced using built-in dbt tests.
 
-**Tests applied across layers:**
-- `unique`
-- `not_null`
+Tests applied across models:
+- Uniqueness constraints
+- Non-null constraints
 
-Test definitions are maintained alongside models using schema YAML files:
-- `raw.yml`
-- `transform.yml`
-- `mart.yml`
+Test definitions are maintained alongside models to ensure transparency and maintainability.
+
+> 📸 **Include screenshot here:** Successful dbt test execution results
 
 All tests passed successfully in both development and production environments.
 
 ---
 
 ## Production Deployment
-A dedicated production database was created in Snowflake to mirror real-world deployment practices.
+A separate production database was created in Snowflake to mirror real-world deployment practices.
 
-**Deployment steps:**
-1. Created a new production environment in dbt
-2. Pointed the production environment to a separate Snowflake database
-3. Created a dbt Cloud job configured to run:
-   dbt build
-4. Executed all models and tests end-to-end in production
+Deployment process:
+- Configured a production environment in dbt
+- Pointed production to a dedicated Snowflake database
+- Executed all models and tests as a single production job
+- Validated successful execution
 
-This ensured that transformations, tests, and dependencies ran successfully in a production context.
+> 📸 **Include screenshot here:** Successful production dbt job run
 
 ---
 
-## Validation and Verification
+## Validation & Verification
+Post-deployment validation confirmed:
+- All expected schemas (RAW, TRANSFORM, MART) were created
+- All expected tables existed in each schema
+- Tables contained data in production
+- Record counts were consistent with expectations
 
-### Post-deployment validation steps included:
-- Confirming RAW, TRANSFORM, and MART schemas were created in the production database
-- Verifying all expected tables existed within each schema
-- Querying Snowflake’s information schema to confirm record counts
-- Spot-checking table contents for correctness and completeness
-
-These steps confirmed both structural and data-level correctness.
+> 📸 **Include screenshot here:** Query results showing populated production tables
 
 ---
 
 ## Repository Contents
-
-### This repository includes all artifacts required to review and understand the pipeline:
-- AWS Glue ETL scripts
-- Snowflake SQL for integrations, stages, and databases
-- Complete dbt project (models, macros, and tests)
+This repository contains:
+- AWS Glue ingestion logic
+- Snowflake configuration artifacts
+- Complete dbt project structure
 - Architecture diagrams
 - Execution and validation screenshots
-- Infrastructure teardown documentation
+- Infrastructure teardown notes
 
-The repository serves as a permanent record of the project after cloud resources were removed.
+Together, these artifacts provide a complete, reviewable record of the project.
 
 ---
 
 ## Infrastructure Teardown
+All AWS and Snowflake resources were intentionally deleted after successful validation to avoid unnecessary cloud costs.
 
-All AWS and Snowflake resources were intentionally deleted after successful validation to avoid ongoing cloud costs.
-
-### This repository remains as proof of:
+This repository remains as permanent evidence of:
 - End-to-end pipeline ownership
 - Secure cloud configuration
 - Production deployment practices
