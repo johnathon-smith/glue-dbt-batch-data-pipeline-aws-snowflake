@@ -69,15 +69,15 @@ Security and access control were implemented using separate IAM roles to enforce
   - Writing data to the S3 bucket
   - Logging execution details to CloudWatch
 
-![Glue_IAM_Role]('screenshots/glue-iam-role.png')
+![Glue_IAM_Role](screenshots/glue-iam-role.png)
 
 ### Snowflake Storage Integration Role
 - Trusted by Snowflake via External ID
 - Read-only access to a specific S3 data prefix
 - Used exclusively by Snowflake to read external data
 
-![Snowflake_IAM_Role]('screenshots/snowflake-iam-role.png')
-![Snowflake_Trust Relationship]('screenshots/snowflake-trust-relationship.png')
+![Snowflake_IAM_Role](screenshots/snowflake-iam-role.png)
+![Snowflake_Trust Relationship](screenshots/snowflake-trust-relationship.png)
 
 This separation mirrors production-grade security patterns used in enterprise environments.
 
@@ -97,8 +97,8 @@ Key characteristics:
 - Data confirmed in the S3 data directory
 - Execution logs reviewed for errors
 
-![Glue Job Success]('screenshots/glue-job-success.png')
-![S3 Contents]('screenshots/s3-contents.png')
+![Glue Job Success](screenshots/glue-job-success.png)
+![S3 Contents](screenshots/s3-contents.png)
 
 ---
 
@@ -117,8 +117,8 @@ Configuration included:
 - External stage access confirmed
 - Data successfully visible from Snowflake
 
-![Snowflake Storage Integration Details]('screenshots/snowflake-integration-details.png')
-![Snowflake Stage Details]('screenshots/snowflake-stage-details.png')
+![Snowflake Storage Integration Details](screenshots/snowflake-integration-details.png)
+![Snowflake Stage Details](screenshots/snowflake-stage-details.png)
 
 This approach minimizes data movement and aligns with Snowflake best practices.
 
@@ -133,7 +133,7 @@ Design highlights:
 - Reusable macros to manage ingestion behavior
 - Model-level documentation and testing
 
-![DBT Project Structure]('screenshots/dbt-project-structure.png')
+![DBT Project Structure](screenshots/dbt-project-structure.png)
 
 ---
 
@@ -157,9 +157,9 @@ Design highlights:
 - Optimized for BI and reporting access
 - Written to a dedicated MART schema
 
-![Raw Schema Table]('screenshots/raw-schema-table.png')
-![Tranform Schema Table]('screenshots/transform-schema-table.png')
-![Mart Schema Tables]('screenshots/mart-schema-tables.png')
+![Raw Schema Table](screenshots/raw-schema-table.png)
+![Tranform Schema Table](screenshots/transform-schema-table.png)
+![Mart Schema Tables](screenshots/mart-schema-tables.png)
 
 ---
 
@@ -185,8 +185,8 @@ Deployment process:
 - Executed all models and tests as a single production job
 - Validated successful execution
 
-![DBT Job Success]('screenshots/dbt-job-success.png')
-![DBT Data Lineage]('screenshots/dbt-lineage.png')
+![DBT Job Success](screenshots/dbt-job-success.png)
+![DBT Data Lineage](screenshots/dbt-lineage.png)
 
 ---
 
@@ -197,7 +197,7 @@ Post-deployment validation confirmed:
 - Tables contained data in production
 - Record counts were consistent with expectations
 
-![Snowflake Validation Details]('screenshots/snowflake-validation-details.png')
+![Snowflake Validation Details](screenshots/snowflake-validation-details.png)
 
 ---
 
